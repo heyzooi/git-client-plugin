@@ -62,6 +62,8 @@ import java.util.regex.Pattern;
  * </b>
  */
 public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
+    
+    public static final String REFS_HEADS = "refs/heads/";
 
     static {
         if (Boolean.getBoolean(GitClient.class.getName() + ".untrustedSSL")) {
@@ -1283,8 +1285,9 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
     }
 
     public ObjectId getHeadRev(String url, String branch) throws GitException, InterruptedException {
-        String[] branchExploded = branch.split("/");
-        branch = branchExploded[branchExploded.length-1];
+        if (!branch.startsWith(REFS_HEADS)) {
+            branch = String.format("%s%s", REFS_HEADS, branch.startsWith("/") ? branch.substring(1) : branch);
+        }
         ArgumentListBuilder args = new ArgumentListBuilder("ls-remote");
         args.add("-h");
 
